@@ -83,7 +83,6 @@ class MovieDescriptionView: UIViewController {
                 return
             }
             do {
-                
                 self.movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
                 //MARK: Need the genre array.
                 for tag in self.movieDetail.genres! {
