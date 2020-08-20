@@ -8,25 +8,34 @@
 
 import Foundation
 
-struct MoviesJson: Codable {
+struct MoviesJson: Decodable {
     let results : [Results]?
 }
 
-struct Results : Codable {
+struct Results : Decodable {
+    let id : Int?
     let title : String?
     let poster_path : String?
     let vote_average : Float?
     let release_date : String?
 }
 
-struct MovieDetail : Codable {
+struct MovieDetail : Decodable {
     let backdrop_path : String?
-    let runtime : String?
+    let runtime : Int?
     let overview : String?
     let genres: [Genres]?
+    
+    //Need to init, thx medium
+    init() {
+        self.backdrop_path = ""
+        self.genres = [Genres]()
+        self.runtime = 0
+        self.overview = ""
+    }
 }
 
-struct Genres : Codable {
+struct Genres : Decodable {
     let id : Int?
     let name: String?
 }

@@ -10,8 +10,6 @@ import UIKit
 
 class MoviesListView: UIViewController{
 
-    
-
     let collectionView : UICollectionView = {
         let screenWidth: CGFloat = UIScreen.main.bounds.width
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -32,6 +30,10 @@ class MoviesListView: UIViewController{
     
     var numberItems: CGFloat = 2
     
+    
+    var fetchingDataAlert : UIAlertController?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -43,11 +45,11 @@ class MoviesListView: UIViewController{
         self.view.backgroundColor = .white
         self.title = "The Movies DB"
         self.setupCollectionView()
+        self.getMoviesData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        getMoviesData()
     }
     
     func setupCollectionView(){
@@ -62,13 +64,12 @@ class MoviesListView: UIViewController{
     }
     
     func getMoviesData(){
+        self.fetchingDataAlert = UIAlertController(title: "Fetching Movies", message: "\n\n", preferredStyle: .alert)
+        self.fetchingDataAlert?.addSpinner()
+        present(self.fetchingDataAlert!, animated: true)
         let jsonUrlString = "https://api.themoviedb.org/3/movie/now_playing?api_key=634b49e294bd1ff87914e7b9d014daed&language=es-ES&page=1"
         guard let urlReq = URL(string: jsonUrlString) else { return }
         let url = URLRequest(url: urlReq)
-//        guard let idCity = defaultValues.string(forKey: UserDefaults.Keys.currentCity) else { return }
-//        url.httpMethod = "GET"
-//        let postString = "idCity=\(idCity)"
-//        url.httpBody = postString.data(using: String.Encoding.utf8)
         URLSession.shared.dataTask(with: url) { (data, response, err) in
             //perhaps check err
             if err != nil || data == nil {
@@ -85,18 +86,15 @@ class MoviesListView: UIViewController{
             do {
                 let moviesJson = try JSONDecoder().decode(MoviesJson.self, from: data)
                 self.results = moviesJson.results!
-                
                 self.getMoviePoster()
-                DispatchQueue.main.async {
-//                    self.collectionView.reloadData()
-                }
+                
             } catch let jsonErr {
                 print("Error serializing json:", jsonErr)
                 return
             }
         }.resume()
 
-    }//
+    }//movies
     
     func getMoviePoster(){
         posterImages.removeAll()
@@ -111,8 +109,10 @@ class MoviesListView: UIViewController{
             
         }
         DispatchQueue.main.async {
-            self.collectionView.reloadData()
+            self.fetchingDataAlert?.dismiss(animated: true, completion: {
+                self.collectionView.reloadData()
+            })
         }
-    }
+    }//get posters
     
-}
+}//end code

@@ -22,12 +22,18 @@ extension MoviesListView : UICollectionViewDelegate, UICollectionViewDataSource,
         return movieCell
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let resultRow = results[indexPath.row]
+        let movieDescriptionView = MovieDescriptionView()
+        movieDescriptionView.idMovie = resultRow.id
+        movieDescriptionView.movieTitle = resultRow.title
+        self.navigationController?.pushViewController(movieDescriptionView, animated: true)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        let width = (view.frame.width - (numberItems - 1) * interlineSpace) / numberItems
         let screenWidth: CGFloat = UIScreen.main.bounds.width
         let width = screenWidth / numberItems
-        let height = width * 1.51098 //the aspect ratio of a movie poster is 27:41
-        
+        let height = width * 1.51098
         return CGSize(width: width, height: height)
     }
     
