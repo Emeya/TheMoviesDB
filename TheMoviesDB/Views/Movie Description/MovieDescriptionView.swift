@@ -130,6 +130,6 @@ class MovieDescriptionView: UIViewController {
             
             self.present(alert, animated: true)
         }
-    }
+    }//error
     
 }//end code

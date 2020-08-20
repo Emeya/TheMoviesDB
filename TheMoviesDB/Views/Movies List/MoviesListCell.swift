@@ -74,7 +74,7 @@ class MoviesListCell: UICollectionViewCell {
         return view
     }()
     
-    let imageUrl = "https://image.tmdb.org/t/p/w342"
+    //MARK: - Load and Layout
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -82,7 +82,7 @@ class MoviesListCell: UICollectionViewCell {
         self.setupLayout()
     }
     
-    //MARK: - Layout
+    
     func setupLayout(){
         addSubview(containerView)
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true
@@ -129,30 +129,12 @@ class MoviesListCell: UICollectionViewCell {
     var movieResults: Results? {
         didSet {
             guard let movieData = movieResults else { return }
-//            print(movieData.vote_average!)
             movieTitle.text = movieData.title
             dateLabel.text = movieData.release_date
             ratingLabel.text = "\(movieData.vote_average!)"
-
-//            guard let posterUrl = movieData.poster_path else {return}
-//            self.getImageData(posterUrl: posterUrl)
         }
     }//didset
     
-    
-    //MARK: Not a good idea.
-//    func getImageData(posterUrl: String){
-//        guard let url = URL(string: imageUrl+posterUrl) else { return }
-//        do {
-//            let imgData = try Data(contentsOf: url)
-//
-//            DispatchQueue.main.async {
-//                self.posterImage.image = UIImage(data: imgData)
-//            }
-//        }catch{
-//        }
-//    }
-
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
