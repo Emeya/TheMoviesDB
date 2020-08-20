@@ -22,6 +22,7 @@ extension MovieDescriptionView : UITableViewDelegate, UITableViewDataSource{
         cell.runtimeValue.text = "\(movieDetail.runtime!) min"
         cell.releaseValue.text = self.date
         cell.calificacionValue.text = "\(movieDetail.vote_average!)"
+        //MARK: need ,
         cell.generosValue.text = genreArray.joined(separator: ", ")
         cell.desctipcionValue.text = movieDetail.overview
         return cell
