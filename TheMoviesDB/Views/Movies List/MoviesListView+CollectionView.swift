@@ -27,6 +27,8 @@ extension MoviesListView : UICollectionViewDelegate, UICollectionViewDataSource,
         let movieDescriptionView = MovieDescriptionView()
         movieDescriptionView.idMovie = resultRow.id
         movieDescriptionView.movieTitle = resultRow.title
+        movieDescriptionView.date = resultRow.release_date
+        movieDescriptionView.votesAVG = resultRow.vote_average
         self.navigationController?.pushViewController(movieDescriptionView, animated: true)
     }
     

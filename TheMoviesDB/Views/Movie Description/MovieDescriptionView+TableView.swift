@@ -16,18 +16,19 @@ extension MovieDescriptionView : UITableViewDelegate, UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: movieDescCellID, for: indexPath) as! MovieDescCell
-//        cell.movieResults = movieDetail[indexPath.row]
-        cell.titleText = self.movieTitle
+        cell.selectionStyle = .none
         cell.movieHeader.image = posterImages
+        cell.movieTitle.text = self.movieTitle
+        cell.runtimeValue.text = "\(movieDetail.runtime!) min"
+        cell.releaseValue.text = self.date
+        cell.calificacionValue.text = "\(movieDetail.vote_average!)"
+        cell.generosValue.text = genreArray.joined(separator: ", ")
+        cell.desctipcionValue.text = movieDetail.overview
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
-    
-    
-    
-    
     
 }

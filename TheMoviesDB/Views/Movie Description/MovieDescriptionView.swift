@@ -15,9 +15,9 @@ class MovieDescriptionView: UIViewController {
         let tv = UITableView()
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.separatorStyle = .none
+        tv.backgroundColor = .clear
         return tv
     }()
-    
     
     var idMovie : Int?
     var movieTitle : String?
@@ -25,8 +25,9 @@ class MovieDescriptionView: UIViewController {
     var date : String?
     
     var movieDetail = MovieDetail()
+    var genreArray = [String]()
     var posterImages = UIImage()
-    let imageUrl = "https://image.tmdb.org/t/p/w342"
+    let posterUrl = "https://image.tmdb.org/t/p/w342"
     
     let movieDescCellID = "movieDescCellID"
     var fetchingDescAlert : UIAlertController?
@@ -40,12 +41,9 @@ class MovieDescriptionView: UIViewController {
     }
     
     func setupViewLoad(){
-        self.title = "Desc view"
         view.backgroundColor = .white
         self.setupTableView()
         self.getMovieDetails()
-        
-//        print(self.movieTitle)
     }
 
     func setupTableView(){
@@ -62,9 +60,6 @@ class MovieDescriptionView: UIViewController {
     //MARK: - Functions
     
     func getMovieDetails(){
-//        self.fetchingDescAlert = UIAlertController(title: "Fetching Movies", message: "\n\n", preferredStyle: .alert)
-//        self.fetchingDescAlert?.addSpinner()
-//        present(self.fetchingDescAlert!, animated: true)
         
         guard let idMovie = idMovie else {return}
         let jsonUrlString = "https://api.themoviedb.org/3/movie/\(idMovie)?api_key=634b49e294bd1ff87914e7b9d014daed&language=es-ES"
@@ -74,20 +69,31 @@ class MovieDescriptionView: UIViewController {
             //perhaps check err
             if err != nil || data == nil {
                 print("Client error")
+                self.showConnectionErrorAlert()
                 return
             }
             //also perhaps check response status 200 OK
             guard let response = response as? HTTPURLResponse, (200...209).contains(response.statusCode) else {
                 print("Server error")
+                self.showConnectionErrorAlert()
                 return
             }
-            guard let data = data else { return }
+            guard let data = data else {
+                self.showConnectionErrorAlert()
+                return
+            }
             do {
                 
                 self.movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
+                //MARK: Need the genre array.
+                for tag in self.movieDetail.genres! {
+                    self.genreArray.append(tag.name!)
+                }
                 self.getMoviePoster()
+                
             } catch let jsonErr {
                 print("Error serializing json:", jsonErr)
+                self.showConnectionErrorAlert()
                 return
             }
         }.resume()
@@ -95,24 +101,35 @@ class MovieDescriptionView: UIViewController {
     }//details
     
     func getMoviePoster(){
-//        posterImages.removeAll()
-//        for item in movieDetail {
-        guard let posterUrl = self.movieDetail.backdrop_path else {return}
-            guard let url = URL(string: imageUrl + posterUrl ) else { return }
-            do {
-                let imgData = try Data(contentsOf: url)
-//                print(imgData)
-                posterImages = UIImage(data: imgData)!
-//                posterImages.append(UIImage(data: imgData)!)
-            }catch{
-            }
-
-//        }
-        DispatchQueue.main.async {
-//            self.fetchingDescAlert?.dismiss(animated: true, completion: {
+        guard let imgUrl = self.movieDetail.backdrop_path else {return}
+        guard let url = URL(string: posterUrl + imgUrl ) else { return }
+        do {
+            let imgData = try Data(contentsOf: url)
+            posterImages = UIImage(data: imgData)!
+            DispatchQueue.main.async {
                 self.tableView.reloadData()
-//            })
+            }
+        }catch{
+            self.showConnectionErrorAlert()
+            return
         }
+        
     }//get posters
+    
+    
+    func showConnectionErrorAlert(){
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Error", message: "No podemos cargar la imagen, revisa tu conexión a internet", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Reintentar Conexion?", style: .default, handler: { (_) in
+                self.getMovieDetails()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancelar", style: .default, handler: { (_) in
+                alert.dismiss(animated: true)
+            }))
+            
+            self.present(alert, animated: true)
+        }
+    }
     
 }//end code

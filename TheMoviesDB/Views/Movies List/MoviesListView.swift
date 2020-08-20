@@ -10,6 +10,8 @@ import UIKit
 
 class MoviesListView: UIViewController{
 
+    //MARK:- Components
+    
     let collectionView : UICollectionView = {
         let screenWidth: CGFloat = UIScreen.main.bounds.width
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -26,13 +28,13 @@ class MoviesListView: UIViewController{
     var results = [Results]()
     var posterImages = [UIImage]()
     let moviesListCellID = "MoviesListCellID"
-    let imageUrl = "https://image.tmdb.org/t/p/w342"
+    let posterUrl = "https://image.tmdb.org/t/p/w342"
     
     var numberItems: CGFloat = 2
-    
-    
     var fetchingDataAlert : UIAlertController?
     
+    
+    //MARK:- Load and Layout
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,11 +49,7 @@ class MoviesListView: UIViewController{
         self.setupCollectionView()
         self.getMoviesData()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
+  
     func setupCollectionView(){
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -62,6 +60,8 @@ class MoviesListView: UIViewController{
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
+    
+    //MARK:- Functions
     
     func getMoviesData(){
         self.fetchingDataAlert = UIAlertController(title: "Fetching Movies", message: "\n\n", preferredStyle: .alert)
@@ -74,15 +74,19 @@ class MoviesListView: UIViewController{
             //perhaps check err
             if err != nil || data == nil {
                 print("Client error")
+                self.showConnectionErrorAlert()
                 return
             }
             //also perhaps check response status 200 OK
             guard let response = response as? HTTPURLResponse, (200...209).contains(response.statusCode) else {
                 print("Server error")
+                self.showConnectionErrorAlert()
                 return
             }
-            guard let data = data else { return }
-            print("data",data)
+            guard let data = data else {
+                self.showConnectionErrorAlert()
+                return
+            }
             do {
                 let moviesJson = try JSONDecoder().decode(MoviesJson.self, from: data)
                 self.results = moviesJson.results!
@@ -90,6 +94,7 @@ class MoviesListView: UIViewController{
                 
             } catch let jsonErr {
                 print("Error serializing json:", jsonErr)
+                self.showConnectionErrorAlert()
                 return
             }
         }.resume()
@@ -99,20 +104,37 @@ class MoviesListView: UIViewController{
     func getMoviePoster(){
         posterImages.removeAll()
         for item in results {
-            guard let url = URL(string: imageUrl + item.poster_path!  ) else { return }
+            guard let url = URL(string: posterUrl + item.poster_path!  ) else { return }
             do {
                 let imgData = try Data(contentsOf: url)
-                print(imgData)
                 posterImages.append(UIImage(data: imgData)!)
             }catch{
+                self.showConnectionErrorAlert()
+                return
             }
-            
         }
         DispatchQueue.main.async {
             self.fetchingDataAlert?.dismiss(animated: true, completion: {
                 self.collectionView.reloadData()
             })
         }
+        
     }//get posters
+    
+    func showConnectionErrorAlert(){
+        DispatchQueue.main.async {
+            self.fetchingDataAlert?.dismiss(animated: true, completion: {
+                let alert = UIAlertController(title: "Error", message: "Revisa tu conexion a internet", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Reintentar Conexion?", style: .default, handler: { (_) in
+                    self.getMoviesData()
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Cancelar", style: .default, handler: { (_) in
+                    alert.dismiss(animated: true)
+                }))
+                self.present(alert, animated: true)
+            })
+        }
+    }
     
 }//end code

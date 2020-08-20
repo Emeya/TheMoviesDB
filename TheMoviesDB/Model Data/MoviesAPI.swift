@@ -24,14 +24,16 @@ struct MovieDetail : Decodable {
     let backdrop_path : String?
     let runtime : Int?
     let overview : String?
+    let vote_average : Float?
     let genres: [Genres]?
     
-    //Need to init, thx medium
+    //Need init?, thx medium
     init() {
         self.backdrop_path = ""
         self.genres = [Genres]()
         self.runtime = 0
         self.overview = ""
+        self.vote_average = 0.0
     }
 }
 

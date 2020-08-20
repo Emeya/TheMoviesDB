@@ -47,6 +47,26 @@ class MoviesListCell: UICollectionViewCell {
         return label
     }()
     
+    let starImage : UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "star")?.withTintColor(UIColor.yellow).withRenderingMode(.alwaysTemplate))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.tintColor = UIColor.yellow
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFit
+        return iv
+    }()
+    
+    let ratingLabel : UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        label.textAlignment = .center
+        label.textColor = .white
+        label.text = "0.0"
+        return label
+    }()
+    
     let labelsContainer : UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -81,8 +101,18 @@ class MoviesListCell: UICollectionViewCell {
         labelsContainer.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         labelsContainer.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
         
+        containerView.addSubview(ratingLabel)
+        ratingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -5).isActive = true
+        ratingLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
+        
+        containerView.addSubview(starImage)
+        starImage.topAnchor.constraint(equalTo: ratingLabel.topAnchor).isActive = true
+        starImage.trailingAnchor.constraint(equalTo: ratingLabel.leadingAnchor, constant: 0).isActive = true
+        starImage.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        starImage.widthAnchor.constraint(equalToConstant: 20).isActive = true
+        
         containerView.addSubview(dateLabel)
-        dateLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -5).isActive = true
+        dateLabel.bottomAnchor.constraint(equalTo: ratingLabel.bottomAnchor).isActive = true
         dateLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 10).isActive = true
         
         containerView.addSubview(movieTitle)
@@ -99,9 +129,10 @@ class MoviesListCell: UICollectionViewCell {
     var movieResults: Results? {
         didSet {
             guard let movieData = movieResults else { return }
-            
+//            print(movieData.vote_average!)
             movieTitle.text = movieData.title
             dateLabel.text = movieData.release_date
+            ratingLabel.text = "\(movieData.vote_average!)"
 
 //            guard let posterUrl = movieData.poster_path else {return}
 //            self.getImageData(posterUrl: posterUrl)
