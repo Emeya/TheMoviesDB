@@ -11,7 +11,6 @@ import UIKit
 class MovieDescCell: UITableViewCell {
 
     //MARK: - Components
-
     let containerView : UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
