@@ -1,5 +1,5 @@
 # TheMoviesDB
-DaCodes practica iOS
+Practica examen para DaCodes
 
 # Instrucciones
 1. Clonar el repositorio o descargar el archivo .ZIP
